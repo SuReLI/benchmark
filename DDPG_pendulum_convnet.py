@@ -15,9 +15,17 @@ from collections import namedtuple
 from itertools import count
 import random as random
 import math as math
+import argparse
+
+parser = argparse.ArgumentParser(description='Run DDPG on Pendulum')
+parser.add_argument('--gpu', help='Use GPU', action='store_true')
+args = parser.parse_args()
 
 #choose device cpu or cuda if a gpu is available
-device=torch.device('cpu')
+if args.gpu : 
+	device=torch.device('cuda')
+else : device=torch.device('cpu')
+print("device : ", device)
 env = gym.make("Pendulum-v0")
 
 #replay memory fucntion
@@ -88,7 +96,7 @@ resize = T.Compose([T.ToPILImage(),
                     T.ToTensor()])
 
 def get_screen():
-    screen = env.render(mode='rgb_array').transpose((2, 0, 1))
+    screen = env.render(mode='rgb_array', display=False).transpose((2, 0, 1))
     screen = np.ascontiguousarray(screen, dtype=np.float32) / 255
     screen = torch.from_numpy(screen)
     screen = screen[:,100:400, 100:400]
@@ -235,7 +243,7 @@ HIGH_BOUND=2
 LOW_BOUND=-2
 
 max_steps=1000
-episodes=2
+episodes=10
 episode_reward=[0]*episodes
 EPS=0.001
 
@@ -286,6 +294,7 @@ for i_episode in range(episodes):
         optimize_model()
         #show the image
 
+        nb_total_steps += 1
 
         #env.render()
         if t>max_steps or done:
@@ -295,13 +304,13 @@ for i_episode in range(episodes):
 time_execution = time.time() - time_beginning
 
 print('---------------------------------------------------')
-print('----STATS------------------------------------------')
+print('--------------------STATS--------------------------')
 print('---------------------------------------------------')
 print(nb_total_steps, ' steps and updates of the network done')
 print(episodes, ' episodes done')
 print('Execution time ', round(time_execution,2), ' seconds')
 print('---------------------------------------------------')
-print('Average nb of steps per second : ', round(nb_total_steps/time_execution, 3), 'steps/s')
+print('Average nb of steps per second : ', round(nb_total_steps/time_execution, 5), 'steps/s')
 print('Average duration of one episode : ', round(time_execution/episodes, 3), 's')
 print('---------------------------------------------------')
 

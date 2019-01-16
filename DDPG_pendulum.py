@@ -12,8 +12,17 @@ from collections import namedtuple
 from itertools import count
 import random as random
 
+import argparse
+
+parser = argparse.ArgumentParser(description='Run DDPG on Pendulum')
+parser.add_argument('--gpu', help='Use GPU', action='store_true')
+args = parser.parse_args()
+
 #choose device cpu or cuda if a gpu is available
-device=torch.device('cpu')
+if args.gpu : 
+	device=torch.device('cuda')
+else : device=torch.device('cpu')
+print("device : ", device)
 env = gym.make("Pendulum-v0")
 
 #replay memory fucntion
@@ -219,7 +228,7 @@ for i_episode in range(episodes):
     if i_episode % 10 == 0 : print(i_episode)
 
     state=env.reset() #initial state
-    state=torch.tensor([state],dtype=torch.float)
+    state=torch.tensor([state],device = device, dtype=torch.float)
 
     # Initialize exploration noise process, parameters in parameters file
     noise_process = np.zeros(ACTION_SIZE)
@@ -234,7 +243,7 @@ for i_episode in range(episodes):
         action += torch.tensor([noise[0]],dtype=torch.float,device=device)
         #perform an action
         next_state,reward,done,_=env.step(action)
-        next_state=torch.tensor([next_state],dtype=torch.float)
+        next_state=torch.tensor([next_state], device = device, dtype=torch.float)
         reward = torch.tensor([reward],device=device,dtype=torch.float)
 
 
