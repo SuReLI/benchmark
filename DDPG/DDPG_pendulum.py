@@ -20,7 +20,6 @@ parser = argparse.ArgumentParser(description='Run DDPG on Pendulum')
 parser.add_argument('--gpu', help='Use GPU', action='store_true')
 args = parser.parse_args()
 
-
 LOW_BOUND = -2
 HIGH_BOUND = 2
 
@@ -288,7 +287,6 @@ def main():
 
     plt.plot(episode_reward[:i_episode])
     plt.show()
-
 
 if __name__ == '__main__':
     main()

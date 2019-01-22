@@ -1,0 +1,5 @@
+
+data/
+DCGAN_Mnist/MNIST_data/
+
+__pycache__/
