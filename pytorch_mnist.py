@@ -33,6 +33,8 @@ def train(args, model, device, train_loader, optimizer, epoch):
     time_beg = time.time()
     counter = 0
     model.train()
+    print(f'Train epoch {epoch}')
+    losses = []
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = data.to(device), target.to(device)
         optimizer.zero_grad()
@@ -41,15 +43,11 @@ def train(args, model, device, train_loader, optimizer, epoch):
         loss.backward()
         optimizer.step()
         counter += 1
-        if batch_idx % args.log_interval == 0:
-            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-                epoch, batch_idx * len(data), len(train_loader.dataset),
-                100. * batch_idx / len(train_loader), loss.item()))
+        losses.append(loss.item())
+    print(f'Loss = {sum(losses)/len(losses):.4f}')
     time_epoch = time.time() - time_beg
-    print('-------------------------------')
-    print('Epoch : ', time_epoch, ' sec')
-    print('Epoch : ', counter, ' gradient descents')
-    print('--------> ', counter/time_epoch, ' steps / s')
+    print(f'Epoch : {counter:.4f} gradient descents in {time_epoch:.4f} sec')
+    print(f'--> \033[91m\033[1m{counter/time_epoch:.4f} steps / s\033[0m')
     
 
 def test(args, model, device, test_loader):
@@ -88,7 +86,7 @@ def main():
                         help='disables CUDA training')
     parser.add_argument('--seed', type=int, default=1, metavar='S',
                         help='random seed (default: 1)')
-    parser.add_argument('--log-interval', type=int, default=100, metavar='N',
+    parser.add_argument('--log-interval', type=int, default=1000, metavar='N',
                         help='how many batches to wait before logging training status')
     
     parser.add_argument('--save-model', action='store_true', default=False,
